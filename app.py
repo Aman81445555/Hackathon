@@ -6,33 +6,32 @@ from bson.objectid import ObjectId
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
+
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for public access
+CORS(app)  
 
 
-# --- 1. Database Connection ---
-# Paste this block exactly. Do not use 'try/except' here to keep it simple.
+# 1. Database Connection 
 
 client = MongoClient("mongodb+srv://admin:Aman%402005@cluster0.zixkaen.mongodb.net/?appName=Cluster0")
 db = client["roboconDB"]
 robots_collection = db["robots"]
 
 print("Connected to MongoDB successfully!")
-# Helper function to convert MongoDB ObjectIds to strings
+
 def serialize_doc(doc):
     doc['_id'] = str(doc['_id'])
     return doc
 
-# --- 2. API Endpoints (CRUD) ---
+#  2. API Endpoints (CRUD)
 
-# CREATE (POST) [cite: 110]
+# CREATE (POST) 
 @app.route('/api/robots', methods=['POST'])
 def create_robot():
     data = request.json
-    # Validation 
+
     if not data or 'name' not in data or 'type' not in data:
         return jsonify({"error": "Missing required fields: name, type"}), 400
     
@@ -48,7 +47,7 @@ def create_robot():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# READ ALL (GET) [cite: 111]
+# READ ALL (GET)
 @app.route('/api/robots', methods=['GET'])
 def get_robots():
     try:
@@ -57,12 +56,12 @@ def get_robots():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# UPDATE (PUT) [cite: 112]
+# UPDATE (PUT)
 @app.route('/api/robots/<id>', methods=['PUT'])
 def update_robot(id):
     data = request.json
     try:
-        # Update the robot and return the new version
+        
         updated_robot = robots_collection.find_one_and_update(
             {"_id": ObjectId(id)},
             {"$set": data},
@@ -75,7 +74,7 @@ def update_robot(id):
     except Exception as e:
         return jsonify({"error": "Invalid ID format or server error"}), 500
 
-# DELETE (DELETE) [cite: 113]
+# DELETE (DELETE) 
 @app.route('/api/robots/<id>', methods=['DELETE'])
 def delete_robot(id):
     try:
